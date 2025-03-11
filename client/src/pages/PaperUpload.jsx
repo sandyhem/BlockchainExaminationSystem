@@ -9,7 +9,10 @@ const PaperUpload = () => {
     contract: null,
     account: null,
   });
- const navigate = useNavigate();
+  const [activePage, setActivePage] = useState(
+    () => localStorage.getItem("activePage") || "home"
+  );
+  const navigate = useNavigate();
   useEffect(() => {
     async function connectWallet() {
       if (window.ethereum) {
@@ -84,8 +87,6 @@ const PaperUpload = () => {
     fetchPaperRequests();
   }, [state.contract]);
 
-
-
   return (
     <div className="container mt-5">
       <div className="d-flex justify-content-between align-items-center mb-4">
@@ -115,7 +116,15 @@ const PaperUpload = () => {
                   <td>{request.teacher}</td>
                   <td>{request.status}</td>
                   <td>
-                    <button className="btn btn-primary" onClick={()=>navigate("/")}>Upload</button>
+                    <button
+                      className="btn btn-primary"
+                      onClick={() => {
+                        navigate("/add-paperUpload");
+                        setActivePage("uploadPaper");
+                      }}
+                    >
+                      Upload
+                    </button>
                   </td>
                 </tr>
               ))

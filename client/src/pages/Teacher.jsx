@@ -1,7 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import "../css/teacher.css";
 import PaperUpload from "./PaperUpload";
+import FileUpload from "./FileUpload";
 
 function TeacherPortal({ setUser }) {
   const navigate = useNavigate();
@@ -11,6 +12,11 @@ function TeacherPortal({ setUser }) {
       () => localStorage.getItem("activePage") || "home"
     );
   
+    useEffect(() => {
+      // Save active page to localStorage whenever it changes
+      localStorage.setItem("activePage", activePage);
+    }, [activePage]);
+
   const handleLogout = () => {
     localStorage.removeItem("user");
     localStorage.removeItem("showSuperintendentPortal");
@@ -25,7 +31,8 @@ function TeacherPortal({ setUser }) {
           <h1 className="title">Teacher Portal</h1>
           <nav className="nav">
           <a href="#" onClick={() => setActivePage("home")}>Home</a>
-          <a href="#/add-paperUpload" onClick={() => setActivePage("paperRequest")}>Paper Requests</a>
+          <a href="#/view-paperRequests" onClick={() => setActivePage("paperRequest")}>Paper Requests</a>
+          <a href="#/add-paperUpload" onClick={() => setActivePage("uploadPaper")}>Upload Paper</a>
           <a href="#" onClick={handleLogout}>Logout</a>
           </nav>
         </div>
@@ -35,7 +42,9 @@ function TeacherPortal({ setUser }) {
       <main className="full-page-content">
         {activePage === "paperRequest" ? (
           <PaperUpload />
-        )  : (
+        )  : activePage === "uploadPaper"?(
+          <FileUpload />
+        ): (
           <div className="welcome-box">
             <h2>Welcome Controller of Examination (COE)</h2>
           </div>

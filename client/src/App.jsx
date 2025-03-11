@@ -13,6 +13,7 @@ import loginsuper from "./pages/loginSuper";
 import RecipientPortal from "./pages/Recipient";
 import CreatePaperRequest from "./pages/PaperRequest";
 import PaperUpload from "./pages/PaperUpload";
+import FileUpload from "./pages/FileUpload";
 
 
 
@@ -76,8 +77,12 @@ function App() {
         /> */}
         {/* Only Teacher should be able to access the below routes */}
         <Route
-          path="/add-paperUpload"
+          path="/view-paperRequests"
           element={user?.role === "teacher" ? <PaperUpload /> : <Navigate to="/" />}
+        />
+         <Route
+          path="/add-paperUpload"
+          element={user?.role === "teacher" ? <FileUpload /> : <Navigate to="/" />}
         />
 
       </Routes>
