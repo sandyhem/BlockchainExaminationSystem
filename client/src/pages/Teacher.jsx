@@ -32,7 +32,7 @@ function TeacherPortal({ setUser }) {
           <nav className="nav">
           <a href="#" onClick={() => setActivePage("home")}>Home</a>
           <a href="#/view-paperRequests" onClick={() => setActivePage("paperRequest")}>Paper Requests</a>
-          <a href="#/add-paperUpload" onClick={() => setActivePage("uploadPaper")}>Upload Paper</a>
+          {/* <a href="#/add-paperUpload" onClick={() => setActivePage("uploadPaper")}>Upload Paper</a> */}
           <a href="#" onClick={handleLogout}>Logout</a>
           </nav>
         </div>

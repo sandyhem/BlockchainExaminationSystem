@@ -14,6 +14,8 @@ import RecipientPortal from "./pages/Recipient";
 import CreatePaperRequest from "./pages/PaperRequest";
 import PaperUpload from "./pages/PaperUpload";
 import FileUpload from "./pages/FileUpload";
+import UploadPrivateIPFS from "./pages/UploadPrivateIpfs";
+import DownloadPrivateIPFS from "./pages/DowloadPrivateIPFS";
 
 
 
@@ -83,6 +85,15 @@ function App() {
          <Route
           path="/add-paperUpload"
           element={user?.role === "teacher" ? <FileUpload /> : <Navigate to="/" />}
+        />
+
+        <Route
+          path="/uploadipfs"
+          element={<UploadPrivateIPFS/> }
+        />
+          <Route
+          path="/downloadipfs"
+          element={<DownloadPrivateIPFS/> }
         />
 
       </Routes>

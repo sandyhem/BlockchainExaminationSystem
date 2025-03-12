@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import Web3 from "web3";
 import QuestionPaperSystem from "../contracts/QuestionPaperSystem.json";
 import { useNavigate } from "react-router-dom";
+import FileUpload from "./FileUpload";
 
 const PaperUpload = () => {
   const [state, setState] = useState({
@@ -9,9 +10,8 @@ const PaperUpload = () => {
     contract: null,
     account: null,
   });
-  const [activePage, setActivePage] = useState(
-    () => localStorage.getItem("activePage") || "home"
-  );
+  const [activePage, setActivePage] = useState("");
+  const [paper, setPaper] = useState(null);
   const navigate = useNavigate();
   useEffect(() => {
     async function connectWallet() {
@@ -69,6 +69,7 @@ const PaperUpload = () => {
           examName: paper.ExamName,
           subject: paper.Subject,
           teacher: paper.teacher,
+          paperId: index + 1,
           status:
             Number(paper.status) === 0
               ? "Requested"
@@ -87,11 +88,14 @@ const PaperUpload = () => {
     fetchPaperRequests();
   }, [state.contract]);
 
-  return (
+  return activePage === "uploadPaper" ? (
+    <FileUpload state={state} paper={paper} />
+  ) : (
     <div className="container mt-5">
       <div className="d-flex justify-content-between align-items-center mb-4">
         <h1>Teacher DashBoard</h1>
       </div>
+
       <div className="card p-4">
         <table className="table table-striped">
           <thead>
@@ -115,17 +119,23 @@ const PaperUpload = () => {
                   <td>{request.subject}</td>
                   <td>{request.teacher}</td>
                   <td>{request.status}</td>
-                  <td>
-                    <button
-                      className="btn btn-primary"
-                      onClick={() => {
-                        navigate("/add-paperUpload");
-                        setActivePage("uploadPaper");
-                      }}
-                    >
-                      Upload
-                    </button>
-                  </td>
+                  {request.status === "Requested" ? (
+                    <td>
+                      <button
+                        className="btn btn-primary"
+                        onClick={() => {
+                          // navigate("/add-paperUpload");
+                          setPaper(request);
+                          setActivePage("uploadPaper");
+                        }}
+                      >
+                        Upload
+                      </button>
+                    </td>
+                  ):(<>
+                  <td className="text-center">Done</td>
+                  </>)
+                  }
                 </tr>
               ))
             ) : (
