@@ -15,7 +15,6 @@ function AddSuperintendent() {
                     const accounts = await web3.eth.getAccounts();
                     const networkId = await web3.eth.net.getId();
                     const deployedNetwork = QuestionPaperSystem.networks[networkId];
-
                     if (!deployedNetwork) {
                         console.error("Contract not deployed on this network.");
                         return;
@@ -48,7 +47,7 @@ function AddSuperintendent() {
     const [formData, setFormData] = useState({
         name: '',
         address: '',
-        email: '',
+        email: '', 
         phone: '',
     });
 
@@ -65,25 +64,36 @@ function AddSuperintendent() {
         window.location.reload();
     };
 
-    async function registerUser() {
-        const { contract, account } = state;
+    async function registerUser() { 
+        const { contract, account, web3 } = state;
         if (!account) {
             alert("Please connect your wallet!");
             return;
         }
         try {
+            const gasPrice = await web3.eth.getGasPrice(); // Fetch the gas price dynamically
+    
             await contract.methods.registerUser(
                 formData.address,
                 formData.name,
-                1,
+                1,  
                 formData.email,
                 formData.phone
-            ).send({ from: account });
+            ).send({ from: account, gasPrice });
+    
             alert("Registration successful");
         } catch (error) {
             console.error("Transaction failed:", error);
+            // alert(error);
+            if (error.message.includes("execution reverted")) {
+                const errorMessage = error.message.split("reverted with reason string '")[1]?.split("'")[0];
+                alert(`Transaction failed: ${errorMessage || "Unknown error"}`);
+            } else {
+                alert("Transaction failed. Check console for details.");
+            }
         }
     }
+
 
     return (
         <div className="container mt-5">

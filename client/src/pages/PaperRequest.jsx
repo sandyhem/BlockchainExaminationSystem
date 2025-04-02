@@ -189,12 +189,14 @@ const CreatePaperRequest = () => {
 
   
   async function createPaperRequest() {
-    const { contract, account } = state;
+    const { contract, account, web3  } = state;
     if (!account) {
       alert("Please connect your wallet!");
       return;
     }
     try {
+      
+      const gasPrice = await web3.eth.getGasPrice();
       await contract.methods
         .createPaperRequest(
           formData.teacher,
@@ -203,11 +205,18 @@ const CreatePaperRequest = () => {
           formData.examName,
           formData.subject
         )
-        .send({ from: account });
+        .send({ from: account, gasPrice });
       alert("Registration successful");
     } catch (error) {
       console.error("Transaction failed:", error);
-    }
+      // alert(error);
+      if (error.message.includes("execution reverted")) {
+          const errorMessage = error.message.split("reverted with reason string '")[1]?.split("'")[0];
+          console.log(`Transaction failed: ${errorMessage || "Unknown error"}`);
+      } else {
+          console.log("Transaction failed. Check console for details.");
+      }
+  }
   }
 
   return (
