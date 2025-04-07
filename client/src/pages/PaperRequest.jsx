@@ -77,6 +77,7 @@ const CreatePaperRequest = () => {
           examName: paper.ExamName,
           subject: paper.Subject,
           teacher: paper.teacher,
+          key:paper.keyCID,
           cid: paper.fileCID,
           status:
             Number(paper.status) === 0
@@ -213,12 +214,22 @@ const CreatePaperRequest = () => {
       return;
     }
     try {
-      
+
+      function generateRandomKey(length) {
+        const array = new Uint8Array(length);
+        window.crypto.getRandomValues(array);
+        return Array.from(array, byte => byte.toString(16).padStart(2, '0')).join('');
+      }
+    
+    // 256-bit key = 32 bytes
+    const aesKeyForPaper = generateRandomKey(32);
+    console.log(aesKeyForPaper)
+    
       const gasPrice = await web3.eth.getGasPrice();
       await contract.methods
         .createPaperRequest(
           formData.teacher,
-          formData.key,
+          aesKeyForPaper,
           formData.examId,
           formData.examName,
           formData.subject
