@@ -3,6 +3,10 @@ import Web3 from "web3";
 import QuestionPaperSystem from "../contracts/QuestionPaperSystem.json";
 import axios from "axios";
 import CryptoJS from "crypto-js";
+/* Notification */
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 const CreatePaperRequest = () => {
 
   const [state, setState] = useState({
@@ -97,6 +101,19 @@ const CreatePaperRequest = () => {
     localStorage.setItem("showTable", JSON.stringify(showTable));
   }, [showTable]);
 
+  /* Notification */
+  const showToastSuccess = (msg) => {
+    toast.success(msg, {
+      position: "top-right"
+    });
+  };
+  
+  const showToastError = (msg) => {
+    toast.warning(msg, {
+      position: "top-right",
+    });
+  };
+/******************** */
   const [cid, setCid] = useState("");
   const [loading, setLoading] = useState(false);
   const [fileUrl, setFileUrl] = useState(null);
@@ -165,6 +182,7 @@ const CreatePaperRequest = () => {
 
     setLoading(false);
   };
+  
   const handleChange = (e) => {
     const { id, value } = e.target;
     setFormData((prevState) => ({
@@ -184,7 +202,7 @@ const CreatePaperRequest = () => {
       key: "",
     });
     setShowTable(true);
-    window.location.reload();
+    // window.location.reload();
   };
 
   
@@ -206,10 +224,11 @@ const CreatePaperRequest = () => {
           formData.subject
         )
         .send({ from: account, gasPrice });
-      alert("Registration successful");
+      showToastSuccess("Registration successful");
     } catch (error) {
       console.error("Transaction failed:", error);
       // alert(error);
+      showToastError("Registration failed");
       if (error.message.includes("execution reverted")) {
           const errorMessage = error.message.split("reverted with reason string '")[1]?.split("'")[0];
           console.log(`Transaction failed: ${errorMessage || "Unknown error"}`);

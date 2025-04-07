@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import "bootstrap/dist/css/bootstrap.min.css"; 
 import "./App.css";
 import "./COE.css";
@@ -36,7 +38,8 @@ function App() {
   }, [user]);
 
   return (
-   
+    <>
+    <ToastContainer />
     <Router>
       <Routes>
         <Route path="/" element={<Login setUser={setUser} />} />
@@ -98,7 +101,7 @@ function App() {
 
       </Routes>
     </Router>
-    
+    </>
   );
 
 }
