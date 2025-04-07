@@ -116,10 +116,11 @@ const CreatePaperRequest = () => {
   };
 /******************** */
   const [cid, setCid] = useState("");
+  const [secretKey,setSecretKey] = useState("");
   const [loading, setLoading] = useState(false);
   const [fileUrl, setFileUrl] = useState(null);
 
-  const secretKey = import.meta.env.VITE_AES_KEY;
+  // const secretKey = import.meta.env.VITE_AES_KEY;
 
   const decryptFile = (encryptedText) => {
     try {
@@ -226,6 +227,7 @@ const CreatePaperRequest = () => {
     console.log(aesKeyForPaper)
     
       const gasPrice = await web3.eth.getGasPrice();
+
       await contract.methods
         .createPaperRequest(
           formData.teacher,
@@ -235,6 +237,7 @@ const CreatePaperRequest = () => {
           formData.subject
         )
         .send({ from: account, gasPrice });
+
       showToastSuccess("Registration successful");
     } catch (error) {
       console.error("Transaction failed:", error);
@@ -292,6 +295,7 @@ const CreatePaperRequest = () => {
                           className="btn btn-primary"
                           onClick={() => {
                             setCid(request.cid)
+                            setSecretKey(request.key)
                             fetchFileFromIPFS()
                           }}
                         >
