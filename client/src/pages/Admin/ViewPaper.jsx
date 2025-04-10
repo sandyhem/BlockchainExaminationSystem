@@ -120,7 +120,7 @@ export default function ViewPaper() {
           formData.endUnix
         )
         .send({ from: account, gasPrice });
-      alert("Access Granted");
+      alert("Access Granted",result);
     } catch (error) {
       console.error("Error fetching paper:", error);
     }
