@@ -47,6 +47,7 @@ const PaperUpload = () => {
     connectWallet();
   }, []);
 
+
   const [paperRequests, setPaperRequests] = useState([]);
 
   const [formData, setFormData] = useState({
@@ -69,6 +70,7 @@ const PaperUpload = () => {
           examName: paper.ExamName,
           subject: paper.Subject,
           teacher: paper.teacher,
+          key: paper.keyCID,
           paperId: index + 1,
           status:
             Number(paper.status) === 0

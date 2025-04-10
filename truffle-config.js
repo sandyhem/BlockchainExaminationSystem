@@ -41,6 +41,14 @@ module.exports = {
     //   provider: privateKeyProvider,
     //   network_id: "1337",
     // },
+    // besuAzure: {
+    //   host: "172.191.148.87", // your Azure VM's public IP
+    //   port: 8545,
+    //   network_id: "*",
+    //   skipDryRun: true,
+    //   timeoutBlocks: 200
+    // }
+    
   },
 
   

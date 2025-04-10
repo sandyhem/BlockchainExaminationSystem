@@ -1,0 +1,49 @@
+/* ExamCard.css */
+.exam-card {
+    transition: all 0.3s ease;
+    border: none;
+    border-radius: 12px;
+    overflow: hidden;
+    cursor: pointer;
+  }
+  
+  .exam-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+  }
+  
+  .exam-card .card-header {
+    border-bottom: none;
+    text-align: center;
+  }
+  
+  .icon-container {
+    margin-top: -10px;
+  }
+  
+  .icon-circle {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    background-color: #f8f9fa;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  }
+  
+  .view-btn {
+    border-radius: 20px;
+    padding: 6px 16px;
+    transition: all 0.2s;
+  }
+  
+  .view-btn:hover {
+    background-color: #0d6efd;
+    color: white;
+  }
+  
+  .card-footer {
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    text-align: center;
+  }

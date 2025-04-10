@@ -5,7 +5,6 @@ import QuestionPaperSystem from "../contracts/QuestionPaperSystem.json";
 
 function AddTeacher() {
     const [state, setState] = useState({ web3: null, contract: null, account: null });
-
     useEffect(() => {
         async function connectWallet() {
             if (window.ethereum) {

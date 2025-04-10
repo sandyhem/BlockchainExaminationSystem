@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import AddSuperintendent from "./Superintendent";
 import CreatePaperRequest from "./PaperRequest";
 import AddTeacher from "./AssignTeacher"; // Import Teacher Page
+import AccessLogPage from "./Admin/AccessLogPage";
 
 function COE({ setUser }) {
   const navigate = useNavigate();
@@ -35,7 +36,9 @@ function COE({ setUser }) {
             <a href="#" onClick={() => setActivePage("home")}>Home</a>
             <a href="#/add-superintendent" onClick={() => setActivePage("superintendent")}>Superintendents</a>
             <a href="#/add-teachers" onClick={() => setActivePage("teachers")}>Teachers</a> {/* Added Teachers Link */}
-            <a href="#/add-paperRequest" onClick={() => setActivePage("paperRequest")}>Raise Paper Requests</a>
+            <a href="#/add-paperRequest" onClick={() => setActivePage("paperRequest")}>Paper Requests</a>
+            {/* <a href="#/verify-paper" onClick={() => setActivePage("verifyPaper")}>verify paper</a> */}
+            <a href="#/access-pages" onClick={() => setActivePage("accessPages")}>AccessPages</a>
             <a href="#" onClick={handleLogout}>Logout</a>
           </nav>
         </div>
@@ -49,6 +52,8 @@ function COE({ setUser }) {
           <AddTeacher />
         ) : activePage === "paperRequest" ? (
           <CreatePaperRequest />
+        ): activePage === "accessPages" ? (
+          <AccessLogPage/>
         ) : (
           <div className="welcome-box">
             <h2>Welcome Controller of Examination (COE)</h2>

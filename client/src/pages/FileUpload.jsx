@@ -10,7 +10,9 @@ const FileUpload = ({ state, paper }) => {
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
   const [cid, setCid] = useState("");
+  // const [secretKey, setSecretKey] = useState("");
   //  console.log(paper);
+
   const secretKey = import.meta.env.VITE_AES_KEY;
 
   const encryptFile = (file) => {
@@ -172,7 +174,9 @@ const FileUpload = ({ state, paper }) => {
 
             <button
               className="btn btn-primary mt-3 w-100"
-              onClick={uploadToPrivateIPFS}
+              onClick={()=>{
+                // setSecretKey(paper.key);
+                uploadToPrivateIPFS()}}
               disabled={!file || isUploading}
             >
               Upload File

@@ -6,6 +6,7 @@ import CryptoJS from "crypto-js";
 /* Notification */
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import { useNavigate } from "react-router-dom";
 
 const CreatePaperRequest = () => {
 
@@ -15,7 +16,7 @@ const CreatePaperRequest = () => {
     account: null,
   });
  const [activePage, setActivePage] = useState("");
-
+ const navigate = useNavigate();
   useEffect(() => {
     async function connectWallet() {
       if (window.ethereum) {
@@ -73,6 +74,7 @@ const CreatePaperRequest = () => {
         const result = await state.contract.methods.getAllPapers().call();
         console.log("result",result);
         const paperRequestsList = result.map((paper, index) => ({
+          index: index,
           examId: paper.ExamId,
           examName: paper.ExamName,
           subject: paper.Subject,
@@ -116,11 +118,11 @@ const CreatePaperRequest = () => {
   };
 /******************** */
   const [cid, setCid] = useState("");
-  const [secretKey,setSecretKey] = useState("");
+  // const [secretKey,setSecretKey] = useState("");
   const [loading, setLoading] = useState(false);
   const [fileUrl, setFileUrl] = useState(null);
 
-  // const secretKey = import.meta.env.VITE_AES_KEY;
+  const secretKey = import.meta.env.VITE_AES_KEY;
 
   const decryptFile = (encryptedText) => {
     try {
@@ -237,8 +239,7 @@ const CreatePaperRequest = () => {
           formData.subject
         )
         .send({ from: account, gasPrice });
-
-      showToastSuccess("Registration successful");
+        showToastSuccess("Registration successful");
     } catch (error) {
       console.error("Transaction failed:", error);
       // alert(error);
@@ -289,20 +290,31 @@ const CreatePaperRequest = () => {
                     <td>{request.subject}</td>
                     <td>{request.teacher}</td>
                     <td>{request.status}</td>
-                    {request.status === "Uploaded" ? (
+                    {request.status === "Uploaded" || request.status === "Verified" ? (
                       <td>
                         <button
                           className="btn btn-primary"
                           onClick={() => {
-                            setCid(request.cid)
-                            setSecretKey(request.key)
-                            fetchFileFromIPFS()
+                            // setCid(request.cid)
+                            // // setSecretKey(request.key)
+                            // fetchFileFromIPFS()
+                            navigate("/verify-paper", {
+                              state: {
+                                paperId: index + 1,
+                                examId: request.examId,
+                                examName: request.examName,
+                                subject: request.subject,
+                                key: request.key,
+                                cid: request.cid,
+                                teacher: request.teacher
+                              },
+                            });
                           }}
                         >
                           View
                         </button>
                       </td>
-                    ) : (
+                    ):(
                       <>
                         <td className="text-center">Pending</td>
                       </>

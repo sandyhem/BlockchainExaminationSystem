@@ -8,16 +8,21 @@ import "./COE.css";
 
 import Login from "./pages/login";
 import COE from "./pages/COE";
-import SuperintendentPortal from "./pages/loginSuper";
+import SuperintendentPortal from "./pages/SuperIntendentModule/loginSuper";
 import AddSuperintendent from "./pages/Superintendent";
 import TeacherPortal from "./pages/Teacher";
-import loginsuper from "./pages/loginSuper"; 
+import loginsuper from "./pages/SuperIntendentModule/loginSuper"; 
 import RecipientPortal from "./pages/Recipient";
 import CreatePaperRequest from "./pages/PaperRequest";
 import PaperUpload from "./pages/PaperUpload";
 import FileUpload from "./pages/FileUpload";
 import UploadPrivateIPFS from "./pages/UploadPrivateIpfs";
 import DownloadPrivateIPFS from "./pages/DowloadPrivateIPFS";
+import Papers from "./pages/SuperIntendentModule/Papers";
+import AccessLogPage from "./pages/Admin/AccessLogPage";
+import ViewPaper from "./pages/Admin/ViewPaper";
+import Assigned from "./pages/SuperIntendentModule/Assigned";
+
 
 
 
@@ -49,7 +54,7 @@ function App() {
           path="/coe"
           element={user?.role === "coe" ? <COE setUser={setUser} /> : <Navigate to="/" />}
         />
-
+        
         {/* Restrict Superintendent Portal */}
         <Route
           path="/superintendent"
@@ -73,6 +78,16 @@ function App() {
         />
 
         <Route
+          path="/verify-paper"
+          element={user?.role === "coe" ? <ViewPaper/> : <Navigate to="/" />}
+        />
+
+        <Route
+          path="/access-pages"
+          element={user?.role === "coe" ? <AccessLogPage/> : <Navigate to="/" />}
+        />
+
+        <Route
           path="/add-paperRequest"
           element={user?.role === "coe" ? <CreatePaperRequest /> : <Navigate to="/" />}
         />
@@ -85,9 +100,24 @@ function App() {
           path="/view-paperRequests"
           element={user?.role === "teacher" ? <PaperUpload /> : <Navigate to="/" />}
         />
+
          <Route
           path="/add-paperUpload"
           element={user?.role === "teacher" ? <FileUpload /> : <Navigate to="/" />}
+        />
+
+        <Route
+          path="/view-papers"
+          element={user?.role === "superintendent" ? <Papers /> : <Navigate to="/" />}
+        />
+         <Route
+          path="/raise-requests"
+          element={user?.role === "superintendent" ? <Papers /> : <Navigate to="/" />}
+        />
+
+        <Route
+          path="/assigned-papers"
+          element={user?.role === "superintendent" ? <Assigned /> : <Navigate to="/" />}
         />
 
         <Route
@@ -98,6 +128,8 @@ function App() {
           path="/downloadipfs"
           element={<DownloadPrivateIPFS/> }
         />
+
+        
 
       </Routes>
     </Router>
