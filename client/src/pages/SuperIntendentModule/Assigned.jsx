@@ -12,7 +12,7 @@ const Assigned = () => {
   const [countdowns, setCountdowns] = useState({});
   const [loading, setLoading] = useState(true);
 
-  // Connect to MetaMask & contract
+  //connect Metamask account
   useEffect(() => {
     async function connectWallet() {
       if (window.ethereum) {

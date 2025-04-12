@@ -220,12 +220,17 @@ contract QuestionPaperSystem {
     function hasAccess(
         uint256 _paperId,
         address _user
-    ) external view returns (bool) {
-        Access memory access = accessControl[_paperId][_user];
-        return
-            access.granted &&
-            block.timestamp >= access.startTime &&
-            block.timestamp <= access.endTime;
+    ) external view returns (bool, uint256, uint256) {
+         require(papers[_paperId].exists, "Invalid paper");
+        require(
+            users[_user].exists && users[_user].isActive,
+            "Invalid or inactive user"
+        );
+         Access memory access = accessControl[_paperId][_user];
+    bool valid = access.granted &&
+                 block.timestamp >= access.startTime &&
+                 block.timestamp <= access.endTime;
+    return (valid, access.startTime, access.endTime);
     }
 
     // function getPaper(

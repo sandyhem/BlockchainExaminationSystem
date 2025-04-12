@@ -22,6 +22,7 @@ import Papers from "./pages/SuperIntendentModule/Papers";
 import AccessLogPage from "./pages/Admin/AccessLogPage";
 import ViewPaper from "./pages/Admin/ViewPaper";
 import Assigned from "./pages/SuperIntendentModule/Assigned";
+import Account from "./account";
 
 
 
@@ -128,6 +129,13 @@ function App() {
           path="/downloadipfs"
           element={<DownloadPrivateIPFS/> }
         />
+          
+          <Route
+          path="/account"
+          element={<Account/> }
+        />
+          
+        
 
         
 

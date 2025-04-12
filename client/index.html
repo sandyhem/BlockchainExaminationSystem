@@ -1,13 +1,29 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon"  href="/exam.png" />
+    <link rel="icon" href="/exam.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Anna University</title>
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // document.addEventListener("keyup", function (e) {
+      //   if (e.key === "PrintScreen") {
+      //     // Optional: clear clipboard or show overlay
+      //     navigator.clipboard.writeText("");
+      //     alert("Screenshots are disabled on this page.");
+      //   }
+      // });
+      document.addEventListener("contextmenu", (e) => e.preventDefault());
+      document.onkeydown = function (e) {
+        if (e.ctrlKey && (e.key === "p" || e.key === "s" || e.key === "u")) {
+          e.preventDefault();
+          alert("This action is disabled.");
+        }
+      };
+    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

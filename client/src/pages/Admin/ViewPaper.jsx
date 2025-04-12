@@ -12,12 +12,16 @@ import { faCopy } from "@fortawesome/free-solid-svg-icons";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
+import { Worker, Viewer } from '@react-pdf-viewer/core';
+import '@react-pdf-viewer/core/lib/styles/index.css';
+
 export default function ViewPaper() {
   const [fileUrl, setFileUrl] = useState(null);
   const [loading, setLoading] = useState(false); //done
   const [accessLogs, setAccessLogs] = useState([]);
   const [paperDetails, setPaperDetails] = useState({}); //done
 
+  //prop pass the paper details
   const { state } = useLocation();
   const paperId = state?.paperId;
   const examName = state?.examName;
@@ -26,6 +30,7 @@ export default function ViewPaper() {
   const key = state?.key;
   const cid = state?.cid;
   const teacher = state?.teacher;
+
   const [accessUsers, setAccessUsers] = useState("");
   const [blockNumeber, setBlockNumber] = useState("");
 
@@ -127,40 +132,69 @@ export default function ViewPaper() {
   };
 
   async function getUsersWithAccess() {
-    const accounts = await states.web3.eth.getAccounts();
-
-    // Get all users
-    const result = await states.contract.methods
-      .getAllUsers()
-      .call({ from: accounts[0] });
-
-    const addresses = result[0];
-    const users = result[1];
-
-    const accessibleUsers = [];
-
-    for (let i = 0; i < addresses.length; i++) {
-      const address = addresses[i];
-
-      const Access = await states.contract.methods
-        .hasAccess(paperId, address)
+    try {
+      const accounts = await states.web3.eth.getAccounts();
+  
+      const result = await states.contract.methods
+        .getAllUsers()
         .call({ from: accounts[0] });
-
-      console.log(Access);
-      if (Access[0]) {
-        accessibleUsers.push({
-          address,
-          user: users[i], // user struct
-          start: Access[1],
-          end: Access[2],
-        });
+  
+      console.log("results:", result);
+  
+      const addresses = result[0];
+      const users = result[1];
+  
+      const accessibleUsers = [];
+  
+      for (let i = 0; i < addresses.length; i++) {
+        const address = addresses[i];
+   // const accessResult = await states.contract.methods
+          //   .hasAccess(paperId, address)
+          //   .call({ from: accounts[0] });
+  
+          // const hasAccess = accessResult[0];
+          // const startTime = accessResult[1];
+          // const endTime = accessResult[2];
+          // if (hasAccess) {
+          //   accessibleUsers.push({
+          //     address,
+          //     user: users[i],
+          //     start: startTime,
+          //     end: endTime,
+          //   });
+          // }
+        try {
+         
+          const access = await states.contract.methods
+          .accessControl(paperId, address)
+          .call({ from: accounts[0] });
+           console.log("the hem:",access);
+        if (access.granted) {
+          accessibleUsers.push({
+            address,            
+            start: access.startTime,
+            end: access.endTime,
+          });
+        } 
+        } catch (error) {
+          console.error("Error checking access:", extractError(error));
+        }
       }
+  
+      console.log("access:", accessibleUsers);
+      setAccessUsers(accessibleUsers);
+    } catch (outerError) {
+      console.error("Error in getUsersWithAccess:", extractError(outerError));
     }
-
-    console.log("access:", accessibleUsers);
-    setAccessUsers(accessibleUsers);
-    await console.log("hem:", accessUsers);
   }
+  
+  // Utility to extract readable error messages from nested errors
+  function extractError(error) {
+    if (error?.data?.message) return error.data.message;
+    if (error?.message) return error.message;
+    return String(error);
+  }
+  
 
   const [remuser,setRemUser] = useState("");
 
@@ -524,11 +558,17 @@ export default function ViewPaper() {
                   </div>
                   <div className="card-body pdf-container">
                     {Number(paperDetails.status) == 1 && fileUrl ? (
-                      <iframe
-                        src={fileUrl}
-                        className="pdf-iframe"
-                        title="Decrypted PDF"
-                      ></iframe>
+                      // <iframe
+                      //   src={fileUrl}
+                      //   className="pdf-iframe"
+                      //   title="Decrypted PDF"
+                      // ></iframe>
+                      <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
+                      <Viewer
+                        fileUrl={fileUrl}
+                        renderToolbar={() => null} // Hide the toolbar
+                      />
+                    </Worker>
                     ) : (
                       <div className="text-center py-5">
                         <i
