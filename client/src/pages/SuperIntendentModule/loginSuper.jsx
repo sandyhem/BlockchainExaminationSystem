@@ -33,8 +33,8 @@ function SuperintendentPortal({ setUser }) {
           <h1 className="title">Superintendent Portal</h1>
           <nav className="nav">
           <a href="#" onClick={() => setActivePage("home")}>Home</a>
-          <a href="#/view-papers" onClick={() => setActivePage("viewpapers")}>View Papers</a>
-          <a href="#/raise-requests" onClick={() => setActivePage("createRequests")}>Raise Requests</a>
+          {/* <a href="#/view-papers" onClick={() => setActivePage("viewpapers")}>View Papers</a>
+          <a href="#/raise-requests" onClick={() => setActivePage("createRequests")}>Raise Requests</a> */}
           <a href="#/assigned-papers" onClick={() => setActivePage("assignedPapers")}>papers</a>
           <a href="#/" onClick={handleLogout}>Logout</a>
           </nav>

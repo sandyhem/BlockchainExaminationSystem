@@ -148,21 +148,7 @@ export default function ViewPaper() {
   
       for (let i = 0; i < addresses.length; i++) {
         const address = addresses[i];
-   // const accessResult = await states.contract.methods
-          //   .hasAccess(paperId, address)
-          //   .call({ from: accounts[0] });
-  
-          // const hasAccess = accessResult[0];
-          // const startTime = accessResult[1];
-          // const endTime = accessResult[2];
-          // if (hasAccess) {
-          //   accessibleUsers.push({
-          //     address,
-          //     user: users[i],
-          //     start: startTime,
-          //     end: endTime,
-          //   });
-          // }
+   
         try {
          
           const access = await states.contract.methods
@@ -435,7 +421,7 @@ export default function ViewPaper() {
               <i className="bi bi-file-earmark-text me-2 text-primary"></i>
               Question Paper View
             </h2>
-            <div className="btn-toolbar mb-2 mb-md-0">
+            {/* <div className="btn-toolbar mb-2 mb-md-0">
               <div className="btn-group me-2">
                 <button
                   type="button"
@@ -453,7 +439,7 @@ export default function ViewPaper() {
               <button type="button" className="btn btn-sm btn-primary">
                 <i className="bi bi-lock me-1"></i> Manage Access
               </button>
-            </div>
+            </div> */}
           </div>
 
           {loading ? (

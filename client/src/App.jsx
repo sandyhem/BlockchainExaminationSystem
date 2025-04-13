@@ -23,6 +23,8 @@ import AccessLogPage from "./pages/Admin/AccessLogPage";
 import ViewPaper from "./pages/Admin/ViewPaper";
 import Assigned from "./pages/SuperIntendentModule/Assigned";
 import Account from "./account";
+import { Form } from "react-bootstrap";
+import FormValidation from "./FormValidation";
 
 
 
@@ -133,6 +135,12 @@ function App() {
           <Route
           path="/account"
           element={<Account/> }
+        />
+
+
+         <Route
+          path="/form"
+          element={<FormValidation/> }
         />
           
         

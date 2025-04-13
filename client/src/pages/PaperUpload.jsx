@@ -4,6 +4,7 @@ import QuestionPaperSystem from "../contracts/QuestionPaperSystem.json";
 import { useNavigate } from "react-router-dom";
 import FileUpload from "./FileUpload";
 
+/* teacher portal papers page */
 const PaperUpload = () => {
   const [state, setState] = useState({
     web3: null,
@@ -65,21 +66,27 @@ const PaperUpload = () => {
       try {
         const result = await state.contract.methods.getAllPapers().call();
         console.log(result);
-        const paperRequestsList = result.map((paper, index) => ({
-          examId: paper.ExamId,
-          examName: paper.ExamName,
-          subject: paper.Subject,
-          teacher: paper.teacher,
-          key: paper.keyCID,
-          paperId: index + 1,
-          status:
-            Number(paper.status) === 0
-              ? "Requested"
-              : Number(paper.status) === 1
-              ? "Uploaded"
-              : "Verified",
-        }));
-
+        const paperRequestsList = result
+  .map((paper, index) => {
+    if (paper.teacher === state.account) {
+      return {
+        examId: paper.ExamId,
+        examName: paper.ExamName,
+        subject: paper.Subject,
+        teacher: paper.teacher,
+        key: paper.keyCID,
+        paperId: index + 1,
+        status:
+          Number(paper.status) === 0
+            ? "Requested"
+            : Number(paper.status) === 1
+            ? "Uploaded"
+            : "Verified",
+      };
+    }
+    return null;
+  })
+  .filter(paper => paper !== null); // Filter out the nulls
         console.log("PaperRequests", paperRequestsList);
         setPaperRequests(paperRequestsList);
       } catch (error) {
@@ -88,7 +95,7 @@ const PaperUpload = () => {
     }
 
     fetchPaperRequests();
-  }, [state.contract]);
+  }, [state.contract,state.account]);
 
   return activePage === "uploadPaper" ? (
     <FileUpload state={state} paper={paper} />
