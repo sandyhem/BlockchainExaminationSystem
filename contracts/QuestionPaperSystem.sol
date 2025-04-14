@@ -122,7 +122,14 @@ contract QuestionPaperSystem {
         string memory _email,
         string memory _contactNumber
     ) external onlyOwner {
-        require(!users[_userAddress].exists, "User already registered");
+    if (users[_userAddress].exists) {
+        require(!users[_userAddress].isActive, "User already exists");
+
+        // Reactivate the user
+        users[_userAddress].isActive = true;
+        emit UserRegistered(_userAddress, _name, _role, true);
+        return;
+    }
         users[_userAddress] = User(
             _name,
             _role,

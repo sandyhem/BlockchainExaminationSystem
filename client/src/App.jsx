@@ -12,7 +12,7 @@ import SuperintendentPortal from "./pages/SuperIntendentModule/loginSuper";
 import AddSuperintendent from "./pages/Superintendent";
 import TeacherPortal from "./pages/Teacher";
 import loginsuper from "./pages/SuperIntendentModule/loginSuper"; 
-import RecipientPortal from "./pages/Recipient";
+
 import CreatePaperRequest from "./pages/PaperRequest";
 import PaperUpload from "./pages/PaperUpload";
 import FileUpload from "./pages/FileUpload";
@@ -22,11 +22,11 @@ import Papers from "./pages/SuperIntendentModule/Papers";
 import AccessLogPage from "./pages/Admin/AccessLogPage";
 import ViewPaper from "./pages/Admin/ViewPaper";
 import Assigned from "./pages/SuperIntendentModule/Assigned";
-import Account from "./account";
-import { Form } from "react-bootstrap";
-import FormValidation from "./FormValidation";
 
-
+import Firestore from "./pages/FireStore/Firestore";
+import Register from "./pages/Authentication/Register";
+import UserAccount from "./pages/UserAccount";
+import UserManage from "./pages/Admin/UserManage";
 
 
 
@@ -50,8 +50,10 @@ function App() {
     <ToastContainer />
     <Router>
       <Routes>
+        
         <Route path="/" element={<Login setUser={setUser} />} />
-
+  
+          <Route path="/register" element={<Register/>}></Route>
         {/* Restrict COE route */}
         <Route
           path="/coe"
@@ -69,10 +71,6 @@ function App() {
           element={user?.role === "teacher" ? <TeacherPortal setUser={setUser} /> : <Navigate to="/" />}
         />
 
-        <Route
-          path="/recipient"
-          element={user?.role === "recipient" ? <RecipientPortal setUser={setUser} /> : <Navigate to="/" />}
-        />
 
         {/* Only COE should be able to add a Superintendent */}
         <Route
@@ -94,6 +92,11 @@ function App() {
           path="/add-paperRequest"
           element={user?.role === "coe" ? <CreatePaperRequest /> : <Navigate to="/" />}
         />
+
+        <Route
+          path="/view-userrequests"
+          element={user?.role === "coe" ? <UserManage /> : <Navigate to="/" />}
+        />
           {/* <Route
           path="/add-accessManage"
           element={user?.role === "coe" ? <CreatePaperRequest /> : <Navigate to="/" />}
@@ -107,6 +110,12 @@ function App() {
          <Route
           path="/add-paperUpload"
           element={user?.role === "teacher" ? <FileUpload /> : <Navigate to="/" />}
+        />
+
+        
+         <Route
+          path="/teacher-account"
+          element={user?.role === "teacher" ? <UserAccount /> : <Navigate to="/" />}
         />
 
         <Route
@@ -123,6 +132,11 @@ function App() {
           element={user?.role === "superintendent" ? <Assigned /> : <Navigate to="/" />}
         />
 
+       <Route
+          path="/superintendent-account"
+          element={user?.role === "superintendent" ? <UserAccount /> : <Navigate to="/" />}
+        />
+
         <Route
           path="/uploadipfs"
           element={<UploadPrivateIPFS/> }
@@ -132,20 +146,12 @@ function App() {
           element={<DownloadPrivateIPFS/> }
         />
           
-          <Route
-          path="/account"
-          element={<Account/> }
-        />
-
+         
 
          <Route
-          path="/form"
-          element={<FormValidation/> }
+          path="/firestore"
+          element={<Firestore/> }
         />
-          
-        
-
-        
 
       </Routes>
     </Router>

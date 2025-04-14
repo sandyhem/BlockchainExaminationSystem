@@ -4,6 +4,7 @@ import AddSuperintendent from "./Superintendent";
 import CreatePaperRequest from "./PaperRequest";
 import AddTeacher from "./AssignTeacher"; // Import Teacher Page
 import AccessLogPage from "./Admin/AccessLogPage";
+import UserManage from "./Admin/UserManage";
 
 function COE({ setUser }) {
   const navigate = useNavigate();
@@ -34,6 +35,7 @@ function COE({ setUser }) {
           </div>
           <nav className="nav">
             <a href="#" onClick={() => setActivePage("home")}>Home</a>
+            <a href="#/view-userrequests" onClick={() => setActivePage("usermanage")}>User Management</a>
             <a href="#/add-superintendent" onClick={() => setActivePage("superintendent")}>Superintendents</a>
             <a href="#/add-teachers" onClick={() => setActivePage("teachers")}>Teachers</a> {/* Added Teachers Link */}
             <a href="#/add-paperRequest" onClick={() => setActivePage("paperRequest")}>Paper Requests</a>
@@ -50,6 +52,9 @@ function COE({ setUser }) {
           <AddSuperintendent />
         ) : activePage === "teachers" ? (  // Render Teacher Page
           <AddTeacher />
+        )
+        : activePage === "usermanage" ? (  // Render Teacher Page
+          <UserManage />
         ) : activePage === "paperRequest" ? (
           <CreatePaperRequest />
         ): activePage === "accessPages" ? (
