@@ -95,7 +95,7 @@ export default function ViewPaper() {
         .getPaper(paperId)
         .send({ from: account, gasPrice });
       console.log("result in the verify paper:", paperId, result);
-
+      console.log(result.sucess);
       // setCid(result.fileCID);
       // setKeyCid(result.keyCID);
       setPaperDetails(result);
@@ -105,6 +105,20 @@ export default function ViewPaper() {
       fetchFileFromIPFS();
     } catch (error) {
       console.error("Error fetching paper:", error);
+
+    }
+    try {
+      const fetchAccessLogs = async () => {
+        if (states.contract) {
+          const logs = await states.contract.methods.getAccessLogs().call();
+          console.log("Access Logs..............:", logs);
+          setLogs(logs);
+        }
+      };
+  
+      fetchAccessLogs();
+    } catch (error) {
+      console.error("Error fetching logs:", error);
     }
   };
 
@@ -181,7 +195,6 @@ export default function ViewPaper() {
     return String(error);
   }
   
-
   const [remuser,setRemUser] = useState("");
 
   const revokeAccess = async() => {
@@ -272,6 +285,7 @@ export default function ViewPaper() {
 
     setLoading(false);
   };
+
   /************************************************** */
   /* Utility functions: */
 
@@ -292,8 +306,20 @@ export default function ViewPaper() {
     navigator.clipboard.writeText(text);
   };
 
-  const logs = useAccessLogs();
+  const [logs,setLogs] = useState([]);
 
+  useEffect(() => {
+    const fetchAccessLogs = async () => {
+      if (states.contract) {
+        const logs = await states.contract.methods.getAccessLogs().call();
+        console.log("Access Logs:", logs);
+        setLogs(logs);
+      }
+    };
+
+    fetchAccessLogs();
+  }, [states.contract]);
+ 
   // Remove duplicates based on all fields matching
   const uniqueLogs = logs.filter(
     (log, index, self) =>
@@ -304,9 +330,8 @@ export default function ViewPaper() {
           l.user === log.user &&
           l.success === log.success &&
           l.reason === log.reason &&
-          l.time === log.time &&
-          l.blockNumber === log.blockNumber &&
-          l.txHash === log.txHash
+          l.timestamp === log.timestamp &&
+          l.blockNumber === log.blockNumber 
       )
   );
 
@@ -592,7 +617,7 @@ export default function ViewPaper() {
                             <th>User Address</th>
                             <th>Status</th>
                             <th>Reason</th>
-                            <th>Transaction Hash</th>
+                          
                             <th>Block No</th>
                           </tr>
                         </thead>
@@ -600,7 +625,7 @@ export default function ViewPaper() {
                           {currentLogs.length > 0 ? (
                             currentLogs.map((log, index) => (
                               <tr key={index}>
-                                <td>{formatDate(log.time)}</td>
+                                <td>{formatDate(Number(log.timestamp))}</td>
                                 <td className="text-monospace">
                                   {formatAddress(log.user)}
                                   <FontAwesomeIcon
@@ -620,16 +645,7 @@ export default function ViewPaper() {
                                   </span>
                                 </td>
                                 <td>{log.reason}</td>
-                                <td className="text-monospace">
-                                  <a
-                                    href={`https://etherscan.io/tx/${log.txHash}`}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className="text-primary"
-                                  >
-                                    {formatAddress(log.txHash)}
-                                  </a>
-                                </td>
+
                                 <td>{log.blockNumber}</td>
                               </tr>
                             ))

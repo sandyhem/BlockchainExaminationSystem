@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import registerservice from '../FireStore/services/registerservice';
+import QuestionPaperSystem from "../../contracts/QuestionPaperSystem.json";
 import 'bootstrap/dist/css/bootstrap.min.css';
+import Web3 from 'web3';
 
 export default function UserManage() {
   const [users, setUsers] = useState([]);
@@ -9,6 +11,37 @@ export default function UserManage() {
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
+  const [state, setState] = useState({ web3: null, contract: null, account: null });
+  useEffect(() => {
+      async function connectWallet() {
+          if (window.ethereum) {
+              try {
+                  const web3 = new Web3(window.ethereum);
+                  await window.ethereum.request({ method: "eth_requestAccounts" });
+                  const accounts = await web3.eth.getAccounts();
+                  const networkId = await web3.eth.net.getId();
+                  const deployedNetwork = QuestionPaperSystem.networks[networkId];
+
+                  if (!deployedNetwork) {
+                      console.error("Contract not deployed on this network.");
+                      return;
+                  }
+
+                  const contract = new web3.eth.Contract(QuestionPaperSystem.abi, deployedNetwork.address);
+                  setState({ web3, contract, account: accounts[0] });
+
+                  window.ethereum.on("accountsChanged", (accounts) => {
+                      setState((prevState) => ({ ...prevState, account: accounts[0] }));
+                  });
+              } catch (error) {
+                  console.error("User denied wallet connection:", error);
+              }
+          } else {
+              console.error("MetaMask not detected.");
+          }
+      }
+      connectWallet();
+  }, []);
 
   useEffect(() => {
     const fetchUsers = async () => {
@@ -47,48 +80,69 @@ export default function UserManage() {
     setFilteredUsers(result);
   }, [searchTerm, statusFilter, users]);
 
-  const handleApprove = async (userId) => {
+  async function registerUser(address,name,email,phone,role) { 
+    const { contract, account, web3 } = state;
+    if (!account) {
+        alert("Please connect your wallet!");
+        return;
+    }
     try {
-      // await registerservice.updateUserStatus(userId, 'approved');
-      // Update local state to reflect the change
+        const gasPrice = await web3.eth.getGasPrice(); // Fetch the gas price dynamically
+
+        await contract.methods.registerUser(
+            address,
+            name,
+            role === "1" ? 0:role === "2"?1:2, 
+            email,
+            phone
+        ).send({ from: account, gasPrice });
+
+        alert("Registration successful");
+    } catch (error) {
+        console.error("Transaction failed:", error);
+        // alert(error);
+        if (error.message.includes("execution reverted")) {
+            const errorMessage = error.message.split("reverted with reason string '")[1]?.split("'")[0];
+            alert(`Transaction failed: ${errorMessage || "Unknown error"}`);
+        } else {
+            alert("Transaction failed. Check console for details.");
+        }
+    }
+}
+  const handleApprove = async (User) => {
+    try {
+      // await registerUser(User.address,User.name,User.email,User.contactNumber,User.role);
+      console.log("User approved:", User.id);
       setUsers(users.map(user => 
-        user.id === userId ? { ...user, status: 'approved' } : user
+        user.id === User.id ? { ...user, generate: 2 } : user
       ));
+      await registerservice.updateGenerateField(User.id, 2);
+      alert("approved successfully");
     } catch (err) {
       console.error("Error approving user:", err);
       setError("Failed to approve user");
+      alert("registered Failed");
     }
   };
 
   const handleDeny = async (userId) => {
     try {
-      // await registerservice.updateUserStatus(userId, 'denied');
-      // Update local state to reflect the change
-      setUsers(users.map(user => 
-        user.id === userId ? { ...user, status: 'denied' } : user
-      ));
+      await registerservice.deleteUser(userId);
+      // setUsers(users.map(user => 
+      //   user.id === userId ? { ...user, status: 'denied' } : user
+      // ));
+      alert("denied successfully");
     } catch (err) {
       console.error("Error denying user:", err);
       setError("Failed to deny user");
+      alert("cant be denied");
     }
   };
 
-  const handleRevoke = async (userId) => {
-    try {
-      await registerservice.updateUserStatus(userId, 'revoked');
-      // Update local state to reflect the change
-      setUsers(users.map(user => 
-        user.id === userId ? { ...user, status: 'revoked' } : user
-      ));
-    } catch (err) {
-      console.error("Error revoking user:", err);
-      setError("Failed to revoke user");
-    }
-  };
 
   const getStatusBadgeClass = (status) => {
     switch(status) {
-      case 'pending':
+      case 'requested':
         return 'bg-info';
       case 'approved':
         return 'bg-primary';
@@ -143,7 +197,7 @@ export default function UserManage() {
                 />
               </div>
             </div>
-            <div className="col-md-6">
+            {/* <div className="col-md-6">
               <select 
                 className="form-select border-primary"
                 value={statusFilter}
@@ -155,7 +209,7 @@ export default function UserManage() {
                 <option value="denied">Denied</option>
                 <option value="revoked">Revoked</option>
               </select>
-            </div>
+            </div> */}
           </div>
 
           {filteredUsers.length === 0 ? (
@@ -181,12 +235,12 @@ export default function UserManage() {
                       <td>{user.name || 'N/A'}</td>
                       <td>{user.univID || 'N/A'}</td>
                       <td>{user.email || 'N/A'}</td>
-                      <td>{user.phone || 'N/A'}</td>
+                      <td>{user.contactNumber || 'N/A'}</td>
                       <td>{user.address || 'N/A'}</td>
                       <td>{user.role === "1" ? "Teacher" : "Superintendent"}</td>
                       <td>
-                        <span className={`badge ${getStatusBadgeClass(user.generate == 1 ? 'pending' : '')}`}>
-                          {user.generate == 1 ?'requested':''}
+                        <span className={`badge ${getStatusBadgeClass(user.generate == 0 ? 'pending' : '')}`}>
+                          {user.generate == 1 ?'requested':'approved'}
                         </span>
                       </td>
                       <td>
@@ -195,7 +249,7 @@ export default function UserManage() {
                             <>
                               <button 
                                 className="btn btn-sm btn-outline-primary" 
-                                onClick={() => handleApprove(user.id)}
+                                onClick={() => handleApprove(user)}
                                 title="Approve User"
                               >
                                 <i className="bi bi-check-circle"></i> Approve
@@ -209,25 +263,7 @@ export default function UserManage() {
                               </button>
                             </>
                           )}
-                          {/* need to be from metamask */}
-                          {user.status === 'approved' && (
-                            <button 
-                              className="btn btn-sm btn-outline-secondary" 
-                              onClick={() => handleRevoke(user.id)}
-                              title="Revoke User"
-                            >
-                              <i className="bi bi-slash-circle"></i> Revoke
-                            </button>
-                          )}
-                          {(user.status === 'denied' || user.status === 'revoked') && (
-                            <button 
-                              className="btn btn-sm btn-outline-primary" 
-                              onClick={() => handleApprove(user.id)}
-                              title="Reinstate User"
-                            >
-                              <i className="bi bi-arrow-counterclockwise"></i> Reinstate
-                            </button>
-                          )}
+
                         </div>
                       </td>
                     </tr>

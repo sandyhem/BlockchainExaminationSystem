@@ -80,6 +80,15 @@ const registerCollectionRef = collection(db, "register");
         await deleteDoc(userDoc)
  }
 
+ const updateGenerateField = async (id, generateValue) => {
+  try {
+    const userDoc = doc(db, "register", id);
+    await updateDoc(userDoc, { generate: generateValue });
+    console.log(`Successfully updated 'generate' field for user ${id}`);
+  } catch (error) {
+    console.error("Error updating 'generate' field:", error);
+  }
+};
 export default {
   addUser,
   getUsers,
@@ -87,5 +96,6 @@ export default {
   updateUser,
   deleteUser,
   getByQuery,
-  getByEmail
+  getByEmail,
+  updateGenerateField
 };
