@@ -67,7 +67,7 @@ function Register() {
       
       <div className="min-vh-100 d-flex align-items-center justify-content-center" 
            style={{
-             backgroundImage: 'url("../../public/images/background.avif")',
+             backgroundImage: 'url("../../public/images/bc.jpg")',
              backgroundSize: 'cover',
              backgroundPosition: 'center',
              backgroundRepeat: 'no-repeat',

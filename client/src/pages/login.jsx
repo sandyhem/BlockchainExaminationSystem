@@ -26,14 +26,18 @@ function Login({ setUser }) {
         if (role === "teacher") {
           const user = await registerservice.getByQuery(email, password, "1");
           if (!user) {
+            alert("Login not successful for teacher");
             throw new Error("Invalid credentials or user not found for teacher.");
           }
+          alert("Login successful for teacher");
           console.log(user);
         } else if (role === "superintendent") {
           const user = await registerservice.getByQuery(email, password, "2");
           if (!user) {
+            alert("Login not successful for superintendent");
             throw new Error("Invalid credentials or user not found for superintendent.");
           }
+          alert("Login successful for superintendent");
           console.log(user);
         }
         
@@ -71,7 +75,7 @@ function Login({ setUser }) {
       
       <div className="min-vh-100 d-flex align-items-center justify-content-center" 
            style={{
-             backgroundImage: 'url("../../public/images/background.avif")',
+             backgroundImage: 'url("../../public/images/bc.jpg")',
              backgroundSize: 'cover',
              backgroundPosition: 'center',
              backgroundRepeat: 'no-repeat',

@@ -43,8 +43,7 @@ contract QuestionPaperSystem {
             uint256 paperId;
             bool success;
             string reason;
-                uint256 timestamp;
-    uint256 blockNumber;
+            uint256 timestamp;
         }
 
     // State Variables
@@ -262,11 +261,11 @@ contract QuestionPaperSystem {
     //     return (paper.fileCID, paper.keyCID);
     // }
 
+
     function getPaper(
         uint256 _paperId
     ) external returns (string memory fileCID, string memory keyCID, string memory ExamId, string memory ExamName,string memory Subject, uint8 status) {
-      uint256 currentTimestamp = block.timestamp;
-      uint256 currentBlock = block.number;
+     
         if (!papers[_paperId].exists) {
             emit PaperAccessAttempt(
                 msg.sender,
@@ -274,7 +273,7 @@ contract QuestionPaperSystem {
                 false,
                 "Invalid paper ID"
             );
-            accessLogs.push(AccessLog(msg.sender, _paperId, false, "Invalid paper", currentTimestamp, currentBlock));
+            // accessLogs.push(AccessLog(msg.sender, _paperId, false, "Invalid paper", currentTimestamp, currentBlock));
             revert("Invalid paper");
         }
 
@@ -286,7 +285,7 @@ contract QuestionPaperSystem {
                     block.timestamp <=
                     accessControl[_paperId][msg.sender].endTime))
         ) {
-             accessLogs.push(AccessLog(msg.sender, _paperId, false, "Access denied", currentTimestamp, currentBlock));
+            //  accessLogs.push(AccessLog(msg.sender, _paperId, false, "Access denied", currentTimestamp, currentBlock));
             emit PaperAccessAttempt(
                 msg.sender,
                 _paperId,
@@ -299,14 +298,22 @@ contract QuestionPaperSystem {
 
         Paper memory paper = papers[_paperId];
         emit PaperAccessAttempt(msg.sender, _paperId, true, "Access granted");
-        accessLogs.push(AccessLog(msg.sender, _paperId, true, "Access granted", currentTimestamp, currentBlock));
+        // accessLogs.push(AccessLog(msg.sender, _paperId, true, "Access granted", currentTimestamp, currentBlock));
         return (paper.fileCID, paper.keyCID, paper.ExamId,paper.ExamName, paper.Subject, uint8(paper.status));
     }
 
     function getAccessLogs() external view returns (AccessLog[] memory) {
         return accessLogs;
     }
-
+         //   address user;
+    //         uint256 paperId;
+    //         bool success;
+    //         string reason;
+    //         uint256 timestamp;
+    function setAccessLogs(uint256 paperId, bool success, string memory reason, uint256 timestamp) external {
+        AccessLog memory log = AccessLog(msg.sender, paperId, success, reason, timestamp);
+        accessLogs.push(log);
+    }
     function getAllPapers() external view returns (Paper[] memory) {
         Paper[] memory result = new Paper[](paperCount);
         for (uint256 i = 1; i <= paperCount; i++) {

@@ -111,7 +111,7 @@ export default function UserManage() {
 }
   const handleApprove = async (User) => {
     try {
-      // await registerUser(User.address,User.name,User.email,User.contactNumber,User.role);
+      await registerUser(User.address,User.name,User.email,User.contactNumber,User.role);
       console.log("User approved:", User.id);
       setUsers(users.map(user => 
         user.id === User.id ? { ...user, generate: 2 } : user

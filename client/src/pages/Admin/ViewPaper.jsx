@@ -85,6 +85,8 @@ export default function ViewPaper() {
 
   const fetchPaperDetails = async () => {
     const { contract, account } = states;
+    let reason = "Access Denied";
+    let success = false;
     if (!contract || !account) {
       console.warn("Web3 or contract not initialized yet.");
       return;
@@ -103,9 +105,24 @@ export default function ViewPaper() {
       console.log("check key", key);
 
       fetchFileFromIPFS();
+      success=true                  // success,
+      reason="Access Granted"      // reason,
+
     } catch (error) {
       console.error("Error fetching paper:", error);
 
+    }
+    try {
+      
+      const gasPrice = await states.web3.eth.getGasPrice();
+      await states.contract.methods.setAccessLogs(
+        paperId,
+        success,                   // success,
+        reason,      // reason,
+        Math.floor(Date.now() / 1000)
+      ).send({ from: account, gasPrice });
+    } catch (error) {
+      console.error("Error in logging:", error);
     }
     try {
       const fetchAccessLogs = async () => {
@@ -326,14 +343,16 @@ export default function ViewPaper() {
       index ===
       self.findIndex(
         (l) =>
-          l.paper === log.paper &&
+          
+          l.paperId === log.paperId &&
           l.user === log.user &&
           l.success === log.success &&
           l.reason === log.reason &&
-          l.timestamp === log.timestamp &&
-          l.blockNumber === log.blockNumber 
+          l.timestamp === log.timestamp 
       )
-  );
+  ).sort((a, b) => Number(b.timestamp) - Number(a.timestamp));
+
+
 
   const [currentPage, setCurrentPage] = useState(1);
   const logsPerPage = 5;
@@ -618,14 +637,18 @@ export default function ViewPaper() {
                             <th>Status</th>
                             <th>Reason</th>
                           
-                            <th>Block No</th>
+                         
                           </tr>
                         </thead>
                         <tbody>
                           {currentLogs.length > 0 ? (
                             currentLogs.map((log, index) => (
                               <tr key={index}>
-                                <td>{formatDate(Number(log.timestamp))}</td>
+                                {
+                                  
+                                }
+                                <td>{new Date(Number(log.timestamp) * 1000).toLocaleString()}</td>
+                                {/* <td>{log.timestamp}</td> */}
                                 <td className="text-monospace">
                                   {formatAddress(log.user)}
                                   <FontAwesomeIcon
@@ -646,7 +669,7 @@ export default function ViewPaper() {
                                 </td>
                                 <td>{log.reason}</td>
 
-                                <td>{log.blockNumber}</td>
+                                
                               </tr>
                             ))
                           ) : (

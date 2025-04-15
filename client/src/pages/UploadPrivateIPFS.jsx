@@ -1,87 +1,104 @@
-import React, { useState } from "react";
-import axios from "axios";
-import CryptoJS from "crypto-js";
+import React, { useEffect, useState } from "react";
+import Web3 from "web3";
+import DirectStorage from "../contracts/DirectStorage.json";
 
-const UploadPrivateIPFS = () => {
+export default function UploadPrivateIPFS() {
+  const [state, setState] = useState({
+    web3: null,
+    contract: null,
+    account: null,
+  });
+
   const [file, setFile] = useState(null);
-  const [cid, setCid] = useState("");
-  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState("");
 
-  const secretKey = import.meta.env.VITE_AES_KEY;
+  // Connect to MetaMask + Initialize contract
+  useEffect(() => {
+    async function connectWallet() {
+      if (window.ethereum) {
+        try {
+          const web3 = new Web3(window.ethereum);
+          await window.ethereum.request({ method: "eth_requestAccounts" });
+          const accounts = await web3.eth.getAccounts();
+          const networkId = await web3.eth.net.getId();
+          const deployedNetwork = DirectStorage.networks[networkId];
 
-  const handleFileChange = (event) => {
-    setFile(event.target.files[0]);
+          if (!deployedNetwork) {
+            console.error("Contract not deployed on this network.");
+            return;
+          }
+
+          const contract = new web3.eth.Contract(
+            DirectStorage.abi,
+            deployedNetwork.address
+          );
+
+          setState({ web3, contract, account: accounts[0] });
+
+          window.ethereum.on("accountsChanged", (accounts) => {
+            setState((prevState) => ({ ...prevState, account: accounts[0] }));
+          });
+        } catch (error) {
+          console.error("User denied wallet connection:", error);
+        }
+      } else {
+        console.error("MetaMask not detected.");
+      }
+    }
+
+    connectWallet();
+  }, []);
+
+  const handleFileChange = (e) => {
+    setFile(e.target.files[0]);
   };
 
-  const encryptFile = (file) => {
+  const convertToBytes = (file) => {
     return new Promise((resolve, reject) => {
-      if (!file) {
-        alert("Please select a file to encrypt!");
-        reject("No file selected");
-        return;
-      }
-
       const reader = new FileReader();
+      reader.onloadend = () => resolve(new Uint8Array(reader.result));
+      reader.onerror = reject;
       reader.readAsArrayBuffer(file);
-      reader.onload = () => {
-        const wordArray = CryptoJS.lib.WordArray.create(new Uint8Array(reader.result));
-        const encrypted = CryptoJS.AES.encrypt(wordArray, CryptoJS.enc.Utf8.parse(secretKey), {
-          mode: CryptoJS.mode.ECB,
-          padding: CryptoJS.pad.Pkcs7,
-        }).toString();
-
-        const blob = new Blob([encrypted], { type: "text/plain" });
-        resolve(blob);
-      };
-      reader.onerror = (error) => reject(error);
     });
   };
 
-  const uploadToPrivateIPFS = async () => {
-    if (!file) {
-      alert("Please select a PDF file.");
+  const handleUpload = async () => {
+    if (!file || !state.contract) {
+      alert("Please select a file and ensure contract is loaded.");
       return;
     }
 
-    setLoading(true);
-
     try {
-      const encryptedBlob = await encryptFile(file);
-      const formData = new FormData();
-      formData.append("file", encryptedBlob, `${file.name}.enc`);
-      formData.append("pinataOptions", JSON.stringify({ cidVersion: 1}));
-      formData.append("pinataMetadata", JSON.stringify({ name: file.name, keyvalues: { private: "true" } }));
+      setStatus("Reading file...");
+      const fileBytes = await convertToBytes(file);
 
-      const pinataApiUrl = "https://api.pinata.cloud/pinning/pinFileToIPFS";
-      const jwtToken = import.meta.env.VITE_PINATA_JWT;
+      setStatus("Uploading to blockchain...");
 
-      const response = await axios.post(pinataApiUrl, formData, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-          Authorization: `Bearer ${jwtToken}`,
-        },
-      });
+      const gasPrice = await state.web3.eth.getGasPrice();
 
-      setCid(response.data.IpfsHash);
-      alert("Encrypted file uploaded successfully to private IPFS!");
+
+        const result = await state.contract.methods
+        .uploadFile(file.name, fileBytes)
+        .send({ from: state.account, gas: 30000000000, gasPrice: gasPrice });
+console.log(result);
+      setStatus("✅ File uploaded successfully!");
     } catch (error) {
       console.error("Upload failed:", error);
-      alert("Upload failed. Check console for details.");
+      setStatus("❌ Upload failed. Check console.");
     }
-
-    setLoading(false);
   };
 
   return (
-    <div style={{ textAlign: "center", padding: "20px" }}>
-      <h2>Upload Private File to IPFS</h2>
-      <input type="file" accept="application/pdf" onChange={handleFileChange} />
-      <button onClick={uploadToPrivateIPFS} disabled={loading}>
-        {loading ? "Encrypting & Uploading..." : "Upload Encrypted PDF"}
+    <div className="p-6 max-w-lg mx-auto bg-white rounded shadow">
+      <h2 className="text-xl font-bold mb-4">Upload File to Blockchain</h2>
+      <input type="file" onChange={handleFileChange} className="mb-4" />
+      <button
+        onClick={handleUpload}
+        className="bg-blue-600 text-white px-4 py-2 rounded"
+      >
+        Upload
       </button>
-      {cid && <p>CID: {cid}</p>}
+      <p className="mt-3 text-gray-700">{status}</p>
     </div>
   );
-};
-
-export default UploadPrivateIPFS;
+}
